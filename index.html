@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>UgPhone Text Share</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      font-family: monospace;
+      background: white;
+      color: black;
+      padding: 20px;
+    }
+    textarea, button {
+      font-size: 16px;
+      padding: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 10px;
+    }
+    .entry {
+      border-top: 1px solid #000;
+      padding-top: 5px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔥 Chuyển văn bản giữa thiết bị</h2>
+  <textarea id="textInput" rows="4" placeholder="Nhập nội dung ở đây..."></textarea>
+  <button onclick="sendText()">Gửi lên</button>
+  <div id="output"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB8j30TJAVLlyy9RaBgXxdEvi6uSOWoHUs",
+      authDomain: "ugphone-6af9f.firebaseapp.com",
+      projectId: "ugphone-6af9f",
+      storageBucket: "ugphone-6af9f.firebasestorage.app",
+      messagingSenderId: "425223449692",
+      appId: "1:425223449692:web:9d12bf407b4536f2ca4a99",
+      measurementId: "G-HVVB8QHP4X"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const textInput = document.getElementById("textInput");
+    const output = document.getElementById("output");
+
+    function sendText() {
+      const text = textInput.value.trim();
+      if (text) {
+        db.collection("messages").add({
+          text: text,
+          time: Date.now()
+        });
+        textInput.value = "";
+      }
+    }
+
+    db.collection("messages").orderBy("time", "desc").onSnapshot((snapshot) => {
+      output.innerHTML = "";
+      snapshot.forEach((doc, index) => {
+        const entry = document.createElement("div");
+        entry.className = "entry";
+        entry.innerHTML = `<b>Cái mới ${snapshot.size - index}</b><br>${doc.data().text}`;
+        output.appendChild(entry);
+      });
+    });
+  </script>
+</body>
+</html>
